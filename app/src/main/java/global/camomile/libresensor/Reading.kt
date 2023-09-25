@@ -1,13 +1,14 @@
 package global.camomile.libresensor
 
 import global.camomile.libresensor.interfaces.IPredictionStrategy
-import global.camomile.libresensor.strategies.SimpleRegression
+import global.camomile.libresensor.strategies.LastValue
+//import global.camomile.libresensor.strategies.SimpleRegression
 
 data class Reading (
     val rawTag: RawTag,
     val readingDate: Long = rawTag.tagDate,
     val timezoneOffsetInMinutes: Int = 0,
-    val predictionStrategy : IPredictionStrategy = SimpleRegression()
+    val predictionStrategy : IPredictionStrategy = LastValue()//SimpleRegression()
 )
 {
     val sensor = Sensor(rawTag)
