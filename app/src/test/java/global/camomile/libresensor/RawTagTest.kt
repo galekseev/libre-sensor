@@ -10,7 +10,7 @@ import org.junit.Test
  */
 class RawTagTest() {
 
-    private val rawTag : ByteArray = RawTagReadings.CloudReading2
+    private val rawTag : ByteArray = RawTagReadings.DorianScholz
     private val tag : RawTag = RawTag(rawTag, "id")
 
     @Test
@@ -33,6 +33,32 @@ class RawTagTest() {
             val glucose = Glucose(trend, 120, false)
             if (index == tag.indexTrend.toInt()) print("LAST ")
             println("trend:$trend glucose:${glucose.glucose(true)} raw trend:$rawTrend cal trend:$calTrend mmol:$mmolTrend")
+        }
+    }
+
+    @Test
+    fun viewTrend(){
+        for (index in 0 until 16) {
+            val trend = tag.trendValue(index.toByte())
+            val rawTrend = tag.rawTrendValue(index.toByte())
+            val byteIndex = 28 + index * 6
+            val bytesBinString = TestUtils.toBinString(
+                byteArrayOf(tag.data[byteIndex+1], tag.data[byteIndex]),
+                byteArrayOf(0x3F.toByte(), 0xFF.toByte())
+            )
+            val bytesBinStringRev = TestUtils.toBinString(
+                byteArrayOf(tag.data[byteIndex], tag.data[byteIndex+1]),
+                byteArrayOf(0xFF.toByte(), 0x3F.toByte())
+            )
+            val originalBinaryString = TestUtils.toBinString(byteArrayOf(tag.data[byteIndex], tag.data[byteIndex+1]))
+            val intBinary1 = TestUtils.toBinString(trend, 16, 0x3FFF)
+            val intBinary2 = TestUtils.toBinString(rawTrend, 16, 0x3FFF)
+
+            println("offset: $byteIndex")
+            println("bin1: $originalBinaryString bytes: ${tag.data[byteIndex]} ${tag.data[byteIndex+1]}")
+            println("bin1: $bytesBinString bin2: $intBinary1 B-trend: $trend")
+            println("bin1: $bytesBinStringRev bin2: $intBinary2 b-trend: $rawTrend")
+            println()
         }
     }
 

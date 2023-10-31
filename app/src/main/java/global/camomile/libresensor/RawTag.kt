@@ -2,6 +2,7 @@ package global.camomile.libresensor
 
 import java.util.*
 import kotlin.experimental.and
+import kotlin.math.floor
 
 @Suppress("ArrayInDataClass")
 data class RawTag (val data: ByteArray, val tagId: String = "", val tagDate: Long = System.currentTimeMillis()){
@@ -16,11 +17,13 @@ data class RawTag (val data: ByteArray, val tagId: String = "", val tagDate: Lon
         return getWord(offsetTrendTable + index * tableEntrySize) and tableEntryMask
     }
 
+    // TODO: Now should be the same as trendValue, decide which one to remove
     fun rawTrendValue(index: Byte): Int {
         val offset = offsetTrendTable + index * tableEntrySize
         return readBits(data, offset, 0, 0x0E)
     }
 
+    // TODO: Research how calibration works
     fun calibratedTrendValue(index: Byte): Double {
         val offset = offsetTrendTable + index * tableEntrySize
         val raw = rawTrendValue(index).toDouble()
@@ -68,12 +71,12 @@ data class RawTag (val data: ByteArray, val tagId: String = "", val tagDate: Lon
         private const val tableEntrySize = 6
         private const val tableEntryMask = 0x3FFF
 
-        private fun makeWord(high: Byte, low: Byte): Int {
-            return 0x100 * (high and 0xFF.toByte()) + (low and 0xFF.toByte())
+        private fun makeWord(high: Int, low: Int): Int {
+            return ((0x100 * high) + (low and 0xFF))
         }
 
         private fun getWord(data: ByteArray, offset: Int): Int {
-            return makeWord(data[offset + 1], data[offset])
+            return makeWord(data[offset + 1].toUByte().toInt(), data[offset].toUByte().toInt())
         }
 
         private fun readCalibrationInfo(data: ByteArray): CalibrationInfo {
@@ -99,7 +102,7 @@ data class RawTag (val data: ByteArray, val tagId: String = "", val tagDate: Lon
             var res = 0
             for (i in 0 until bitCount) {
                 val totalBitOffset = byteOffset * 8 + bitOffset + i
-                val byte1 = totalBitOffset / 8
+                val byte1 = floor(totalBitOffset.toDouble() / 8).toInt()
                 val bit = totalBitOffset % 8
                 if (totalBitOffset >= 0 && ((buffer[byte1].toInt() shr bit) and 0x1) == 1) {
                     res = res or (1 shl i)
@@ -107,16 +110,5 @@ data class RawTag (val data: ByteArray, val tagId: String = "", val tagDate: Lon
             }
             return res
         }
-//
-//        fun toHexString(src: ByteArray): String {
-//            val builder = StringBuilder("")
-//            val buffer = CharArray(2)
-//            for (b in src) {
-//                buffer[0] = Character.forDigit(b.toInt() ushr 4 and 0x0F, 16)
-//                buffer[1] = Character.forDigit(b.toInt() and 0x0F, 16)
-//                builder.append(buffer)
-//            }
-//            return builder.toString()
-//        }
     }
 }
