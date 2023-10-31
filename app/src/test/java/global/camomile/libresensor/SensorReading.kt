@@ -11,7 +11,7 @@ class ReadingTest() {
 
     @Test
     fun trends(){
-        val rd = Reading(rawTag)
+        val rd = Reading(RawTag(RawTagReadings.DorianScholz))
 
         println("Trends: ${rd.trend.size} records")
         rd.trend.forEach{ println("%.1f %s".format(it.glucose(true), it.ageInSensorMinutes)) }

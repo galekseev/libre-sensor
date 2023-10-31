@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
@@ -5,11 +7,11 @@ plugins {
 
 android {
     namespace 'global.camomile.libresensor'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         minSdk 23
-        targetSdk 33
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -32,11 +34,11 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.10.1'
-    implementation 'org.nield:kotlin-statistics:1.1.1'
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'org.nield:kotlin-statistics:1.2.1'
     testImplementation 'junit:junit:4.13.2'
 }
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
         languageVersion = "1.8"
     }
