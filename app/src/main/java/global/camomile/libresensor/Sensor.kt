@@ -10,7 +10,7 @@ data class Sensor (val serialNumber: String, val startDate: Long, val ageInMinut
             .coerceAtLeast(0)
 
     constructor(rawTagData: RawTag) : this(
-        RawTag.toHexString(rawTagData.sensorSerial),
+        rawTagData.tagId,
         rawTagData.tagDate - rawTagData.tagDate % TimeUnit.MINUTES.toMillis(1)
                 - TimeUnit.MINUTES.toMillis(rawTagData.sensorAgeInMinutes.toLong()),
         rawTagData.sensorAgeInMinutes
