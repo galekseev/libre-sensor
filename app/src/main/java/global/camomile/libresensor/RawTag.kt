@@ -2,39 +2,69 @@ package global.camomile.libresensor
 
 import java.util.*
 import kotlin.experimental.and
-import kotlin.math.floor
 
 @Suppress("ArrayInDataClass")
 data class RawTag (val data: ByteArray, val tagId: String = "", val tagDate: Long = System.currentTimeMillis()){
 
-    val indexTrend: Byte = getByte(offsetTrendIndex)
-    val indexHistory: Byte = getByte(offsetHistoryIndex)
+    val indexTrend: Int = getByte(offsetTrendIndex).toInt()
+    val indexHistory: Int = getByte(offsetHistoryIndex).toInt()
     val sensorAgeInMinutes: Int = getWord(offsetSensorAge)
     val sensorLifetime: Int = getWord(offsetSensorLifetime)
     val calibrationInfo: CalibrationInfo = readCalibrationInfo(data)
 
-    fun trendValue(index: Byte): Int {
-        return getWord(offsetTrendTable + index * tableEntrySize) and tableEntryMask
+    fun trendValue(index: Int): Int {
+        return getTableValue(index, offsetTrendTable)
     }
 
-    // TODO: Now should be the same as trendValue, decide which one to remove
-    fun rawTrendValue(index: Byte): Int {
-        val offset = offsetTrendTable + index * tableEntrySize
-        return readBits(data, offset, 0, 0x0E)
+    fun historyValue(index: Int): Int {
+        return getTableValue(index, offsetHistoryTable)
+    }
+
+    private fun getTableValue(index: Int, offset: Int): Int{
+        //return readBits(data, offset + index * tableEntrySize, 0, 0x0E)
+        return getWord(offset + index * tableEntrySize) and tableEntryMask
+    }
+
+    fun trendTemperature(index: Int): Int {
+        return getTemperature(index, offsetTrendTable)
+    }
+
+    fun historyTemperature(index: Int): Int {
+        return getTemperature(index, offsetHistoryTable)
+    }
+
+    private fun getTemperature(index: Int, offset: Int): Int {
+        return readBits(data, offset + index * tableEntrySize, 0x1a, 0xc) shl 2
+    }
+
+    fun trendTempAdjustment(index: Int): Int {
+        return  getTempAdjustment(index, offsetTrendTable)
+    }
+
+    fun historyTempAdjustment(index: Int): Int {
+        return getTempAdjustment(index, offsetHistoryTable)
+    }
+
+    private fun getTempAdjustment(index: Int, offset: Int): Int {
+        val temperatureAdjustment = readBits(data,  offset + index * tableEntrySize, 0x26, 0x9) shl 2
+        val negAdj = readBits(data, offset, 0x2f, 0x1) != 0
+        return if (negAdj) -temperatureAdjustment else temperatureAdjustment
+    }
+
+    private fun getQualityFlags(index: Int, offset: Int): Int {
+        return (readBits(data, offset, 0xe, 0xb) and 0x600) shr 9
+    }
+
+    private fun getQuality(index: Int, offset: Int): Int {
+        return readBits(data, offset, 0xe, 0xb) and 0x1ff
     }
 
     // TODO: Research how calibration works
-    fun calibratedTrendValue(index: Byte): Double {
-        val offset = offsetTrendTable + index * tableEntrySize
-        val raw = rawTrendValue(index).toDouble()
-        val temp = (readBits(data, offset, 0x1a, 0xc) shl 2).toDouble()
-        val tempAdj = (readBits(data, offset, 0x26, 0x9) shl 2).toDouble();
-        val negTemp = readBits(data, offset, 0x2f, 0x1) != 0
-        return calibrationInfo.calibrate(raw, temp, if (negTemp) -tempAdj else tempAdj)
-    }
-
-    fun historyValue(index: Byte): Int {
-        return getWord(offsetHistoryTable + index * tableEntrySize) and tableEntryMask
+    fun calibratedTrendValue(index: Int): Double {
+        val raw = trendValue(index).toDouble()
+        val temp = trendTemperature(index).toDouble()
+        val tempAdj = trendTempAdjustment(index).toDouble();
+        return calibrationInfo.calibrate(raw, temp, tempAdj)
     }
 
     private fun getWord(offset: Int): Int {
@@ -102,7 +132,7 @@ data class RawTag (val data: ByteArray, val tagId: String = "", val tagDate: Lon
             var res = 0
             for (i in 0 until bitCount) {
                 val totalBitOffset = byteOffset * 8 + bitOffset + i
-                val byte1 = floor(totalBitOffset.toDouble() / 8).toInt()
+                val byte1 = totalBitOffset / 8
                 val bit = totalBitOffset % 8
                 if (totalBitOffset >= 0 && ((buffer[byte1].toInt() shr bit) and 0x1) == 1) {
                     res = res or (1 shl i)

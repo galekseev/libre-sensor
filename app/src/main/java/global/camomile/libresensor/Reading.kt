@@ -23,7 +23,7 @@ data class Reading (
 
         for (counter in 0 until NUM_TREND_VALUES) {
             val index = (indexTrend + counter) % NUM_TREND_VALUES
-            val glucoseLevelRaw = rawTag.trendValue(index.toByte())
+            val glucoseLevelRaw = rawTag.trendValue(index)
             // skip zero values if the sensor has not filled the ring buffer yet completely
             if (glucoseLevelRaw > 0) {
                 val ageInSensorMinutes = sensor.ageInMinutes - NUM_TREND_VALUES + counter
@@ -53,7 +53,7 @@ data class Reading (
         // read history values from ring buffer, starting at indexHistory (bytes 124-315)
         for (counter in 0 until NUM_HISTORY_VALUES) {
             val index = (indexHistory + counter) % NUM_HISTORY_VALUES
-            val glucoseLevelRaw: Int = rawTag.historyValue(index.toByte())
+            val glucoseLevelRaw: Int = rawTag.historyValue(index)
             // skip zero values if the sensor has not filled the ring buffer yet completely
             if (glucoseLevelRaw > 0) {
                 val dataAgeInMinutes =
