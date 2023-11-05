@@ -5,25 +5,34 @@ import global.camomile.libresensor.strategies.LastValue
 //import global.camomile.libresensor.strategies.SimpleRegression
 
 data class Reading (
-    val rawTag: RawTag,
-    val readingDate: Long = rawTag.tagDate,
+    val tag: RawTag,
+    val readingDate: Long = tag.tagDate,
     val timezoneOffsetInMinutes: Int = 0,
     val predictionStrategy : IPredictionStrategy = LastValue()//SimpleRegression()
 )
 {
-    val sensor = Sensor(rawTag)
+    val sensor = Sensor(tag)
     val trend: ArrayList<Glucose> = ArrayList()
     val history: ArrayList<Glucose> = ArrayList()
     val glucose : Glucose?
     val prediction : Prediction?
 
+    constructor(
+        data: ByteArray,
+        tagId: String = "",
+        tagDate: Long = System.currentTimeMillis(),
+        readingDate: Long = tagDate,
+        timezoneOffsetInMinutes: Int = 0,
+        predictionStrategy : IPredictionStrategy = LastValue()//SimpleRegression()
+    ) : this(RawTag(data, tagId, tagDate), readingDate, timezoneOffsetInMinutes, predictionStrategy)
+
     init {
         // read trend values from ring buffer, starting at indexTrend
-        val indexTrend = rawTag.indexTrend
+        val indexTrend = tag.indexTrend
 
         for (counter in 0 until NUM_TREND_VALUES) {
             val index = (indexTrend + counter) % NUM_TREND_VALUES
-            val glucoseLevelRaw = rawTag.trendValue(index)
+            val glucoseLevelRaw = tag.trendValue(index)
             // skip zero values if the sensor has not filled the ring buffer yet completely
             if (glucoseLevelRaw > 0) {
                 val ageInSensorMinutes = sensor.ageInMinutes - NUM_TREND_VALUES + counter
@@ -46,14 +55,14 @@ data class Reading (
         }
 
         val mostRecentHistoryAgeInMinutes = 3 + (sensor.ageInMinutes - 3) % HISTORY_INTERVAL_IN_MINUTES
-        val indexHistory: Int = rawTag.indexHistory.toInt()
+        val indexHistory: Int = tag.indexHistory.toInt()
         val glucoseLevels = ArrayList<Int>()
         val ageInSensorMinutesList = ArrayList<Int>()
 
         // read history values from ring buffer, starting at indexHistory (bytes 124-315)
         for (counter in 0 until NUM_HISTORY_VALUES) {
             val index = (indexHistory + counter) % NUM_HISTORY_VALUES
-            val glucoseLevelRaw: Int = rawTag.historyValue(index)
+            val glucoseLevelRaw: Int = tag.historyValue(index)
             // skip zero values if the sensor has not filled the ring buffer yet completely
             if (glucoseLevelRaw > 0) {
                 val dataAgeInMinutes =
