@@ -142,5 +142,18 @@ class TestUtils {
             }
             return builder.toString()
         }
+
+        fun binary2bPrettyPrint(
+            argName: String, number: Int, numberBits: Int, numberMask: Long,
+            byteHigh: Byte, byteLow: Byte, bytesMask: Long, rawNumber: Int = number
+        ): String {
+            val numberInt = toBinString(rawNumber, numberBits, numberMask)
+            val numberBin = toBinString(bytesToInt(0, 0, byteHigh, byteLow), numberBits, bytesMask)
+            return if (number == rawNumber)
+                "bytes: $numberBin int: $numberInt $argName: $number"
+            else
+                "bytes: $numberBin int: $numberInt raw: $rawNumber $argName: $number"
+        }
+
     }
 }

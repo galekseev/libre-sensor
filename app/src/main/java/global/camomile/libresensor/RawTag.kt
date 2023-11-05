@@ -47,16 +47,43 @@ data class RawTag (val data: ByteArray, val tagId: String = "", val tagDate: Lon
 
     private fun getTempAdjustment(index: Int, offset: Int): Int {
         val temperatureAdjustment = readBits(data,  offset + index * tableEntrySize, 0x26, 0x9) shl 2
-        val negAdj = readBits(data, offset, 0x2f, 0x1) != 0
+        val negAdj = readBits(data, offset + index * tableEntrySize, 0x2f, 0x1) != 0
         return if (negAdj) -temperatureAdjustment else temperatureAdjustment
     }
 
+    fun trendQualityFlags(index: Int): Int {
+        return getQualityFlags(index, offsetTrendTable)
+    }
+
+    fun historyQualityFags(index: Int): Int {
+        return getQualityFlags(index, offsetHistoryTable)
+    }
+
     private fun getQualityFlags(index: Int, offset: Int): Int {
-        return (readBits(data, offset, 0xe, 0xb) and 0x600) shr 9
+        return (readBits(data, offset + index * tableEntrySize, 0xe, 0xc) and 0x600) shr 9
+    }
+
+    fun trendHasError(index: Int): Int {
+        return hasError(index, offsetTrendTable)
+    }
+
+    fun historyHasError(index: Int): Int {
+        return hasError(index, offsetHistoryTable)
+    }
+    private fun hasError(index: Int, offset: Int): Int {
+        return readBits(data, offset + index * tableEntrySize, 0x19, 0x1)
+    }
+
+    fun trendQuality(index: Int): Int {
+        return getQuality(index, offsetTrendTable)
+    }
+
+    fun historyQuality(index: Int): Int {
+        return getQuality(index, offsetHistoryTable)
     }
 
     private fun getQuality(index: Int, offset: Int): Int {
-        return readBits(data, offset, 0xe, 0xb) and 0x1ff
+        return readBits(data, offset + index * tableEntrySize, 0xe, 0xb) and 0x1ff
     }
 
     // TODO: Research how calibration works

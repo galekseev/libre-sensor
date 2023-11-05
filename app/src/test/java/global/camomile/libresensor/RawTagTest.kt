@@ -1,5 +1,6 @@
 package global.camomile.libresensor
 
+import androidx.core.location.LocationRequestCompat.Quality
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -38,106 +39,32 @@ class RawTagTest() {
     @Test
     fun viewTrend(){
         for (index in 0 until 16) {
-            val trend = tag.trendValue(index)
             val byteIndex = 28 + index * 6
-            val bytesBin = TestUtils.toBinString(
-                byteArrayOf(tag.data[byteIndex+1], tag.data[byteIndex]),
-                byteArrayOf(0x3F.toByte(), 0xFF.toByte())
+            val record = tag.data.sliceArray(byteIndex until byteIndex + 7)
+            printRecord( record, index, byteIndex,
+                tag.trendValue(index),
+                tag.trendQuality(index),
+                tag.trendQualityFlags(index),
+                tag.trendHasError(index),
+                tag.trendTemperature(index),
+                tag.trendTempAdjustment(index)
             )
-
-            val originalBin = TestUtils.toBinString(byteArrayOf(tag.data[byteIndex], tag.data[byteIndex+1]))
-            val intBin = TestUtils.toBinString(trend, 16, 0x3FFF)
-
-            //readBits(data, offsetTrendTable + index * tableEntrySize, 0x1a, 0xc) shl 2
-            val temp = tag.trendTemperature(index)
-            val rawTemp = temp shr 2
-            val int2bin = TestUtils.toBinString(rawTemp, 16, 0x0FFF)
-            val tempBin = TestUtils.toBinString(
-                byteArrayOf(tag.data[byteIndex+4], tag.data[byteIndex+3]),
-                byteArrayOf(0x3F.toByte(), 0xFC.toByte())
-            )
-
-            //readBits(data, offsetTrendTable + index * tableEntrySize, 0x26, 0x9) shl 2
-            val tempAdj = tag.trendTempAdjustment(index)
-            val rawTempAdj = tempAdj shr 2
-            val int3bin = TestUtils.toBinString(rawTempAdj, 16, 0x01FF)
-            val tempAdjBin = TestUtils.toBinString(
-                byteArrayOf(tag.data[byteIndex+5], tag.data[byteIndex+4]),
-                byteArrayOf(0x7F.toByte(), 0xC0.toByte())
-            )
-            val readingPoint = TestUtils.bytesToLong(0, 0,
-                tag.data[byteIndex+5],
-                tag.data[byteIndex+4],
-                tag.data[byteIndex+3],
-                tag.data[byteIndex+2],
-                tag.data[byteIndex+1],
-                tag.data[byteIndex],
-            )
-            val readingPointBin = TestUtils.toBinString(
-                readingPoint,
-                48,
-                arrayOf(0x3FFF, 0x3FFC000000, 0x7FC000000000, 0x03800000, 0x800000000000 , 0x7FC000)
-            )
-
-            println("${if (tag.indexTrend == index) "ACTUAL " else ""}offset: $byteIndex")
-            println("raw: $readingPointBin")
-            println("bin1: $bytesBin bin2: $intBin trend: $trend")
-            println("temp: $tempBin binT: $int2bin temp: $temp raw: $rawTemp")
-            println("tadj: $tempAdjBin binA: $int3bin tadj: $tempAdj raw: $rawTempAdj")
-            println()
         }
     }
 
     @Test
     fun viewHistory(){
         for (index in 0 until 32) {
-            val trend = tag.historyValue(index)
-            val byteIndex = 28 + index * 6
-            val bytesBin = TestUtils.toBinString(
-                byteArrayOf(tag.data[byteIndex+1], tag.data[byteIndex]),
-                byteArrayOf(0x3F.toByte(), 0xFF.toByte())
+            val byteIndex = 124 + index * 6
+            val record = tag.data.sliceArray(byteIndex until byteIndex + 7)
+            printRecord( record, index, byteIndex,
+                tag.trendValue(index),
+                tag.trendQuality(index),
+                tag.trendQualityFlags(index),
+                tag.trendHasError(index),
+                tag.trendTemperature(index),
+                tag.trendTempAdjustment(index)
             )
-
-            val originalBin = TestUtils.toBinString(byteArrayOf(tag.data[byteIndex], tag.data[byteIndex+1]))
-            val intBin = TestUtils.toBinString(trend, 16, 0x3FFF)
-
-            //readBits(data, offsetTrendTable + index * tableEntrySize, 0x1a, 0xc) shl 2
-            val temp = tag.historyTemperature(index)
-            val rawTemp = temp shr 2
-            val int2bin = TestUtils.toBinString(rawTemp, 16, 0x0FFF)
-            val tempBin = TestUtils.toBinString(
-                byteArrayOf(tag.data[byteIndex+4], tag.data[byteIndex+3]),
-                byteArrayOf(0x3F.toByte(), 0xFC.toByte())
-            )
-
-            //readBits(data, offsetTrendTable + index * tableEntrySize, 0x26, 0x9) shl 2
-            val tempAdj = tag.historyTempAdjustment(index)
-            val rawTempAdj = tempAdj shr 2
-            val int3bin = TestUtils.toBinString(rawTempAdj, 16, 0x01FF)
-            val tempAdjBin = TestUtils.toBinString(
-                byteArrayOf(tag.data[byteIndex+5], tag.data[byteIndex+4]),
-                byteArrayOf(0x7F.toByte(), 0xC0.toByte())
-            )
-            val readingPoint = TestUtils.bytesToLong(0, 0,
-                tag.data[byteIndex+5],
-                tag.data[byteIndex+4],
-                tag.data[byteIndex+3],
-                tag.data[byteIndex+2],
-                tag.data[byteIndex+1],
-                tag.data[byteIndex],
-            )
-            val readingPointBin = TestUtils.toBinString(
-                readingPoint,
-                48,
-                arrayOf(0x3FFF, 0x3FFC000000, 0x7FC000000000, 0x03800000, 0x800000000000 , 0x7FC000)
-            )
-
-            println("${if (tag.indexHistory == index) "ACTUAL " else ""}offset: $byteIndex")
-            println("raw: $readingPointBin")
-            println("bin1: $bytesBin bin2: $intBin trend: $trend")
-            println("temp: $tempBin binT: $int2bin temp: $temp raw: $rawTemp")
-            println("tadj: $tempAdjBin binA: $int3bin tadj: $tempAdj raw: $rawTempAdj")
-            println()
         }
     }
 
@@ -203,11 +130,6 @@ class RawTagTest() {
     }
 
     @Test
-    fun viewTemperature(){
-
-    }
-
-    @Test
     fun history() {
         val index = tag.indexHistory
         val history = tag.historyValue(index)
@@ -228,6 +150,65 @@ class RawTagTest() {
         assertEquals(20757, lifetime)
     }
 
+    private fun printRecord(
+        record: ByteArray, index: Int, offset: Int,
+        trend: Int, quality: Int, qualityFlags: Int, hasError: Int, temp: Int, tempAdj: Int
+    ){
+        val trendString = TestUtils.binary2bPrettyPrint(
+            "trend", trend, 16, 0x3FFF,
+            record[1], record[0], 0x3FFF
+        )
+
+        val qualityString = TestUtils.binary2bPrettyPrint(
+            "quality", quality, 16, 0x01FF,
+            record[2], record[1], 0x7FC0
+        )
+
+        val qualityFlagsString = TestUtils.binary2bPrettyPrint(
+            "q_flags", qualityFlags, 16, 0x0007,
+            record[3], record[2], 0x0180
+        )
+
+        val hasErrorString = TestUtils.binary2bPrettyPrint(
+            "error", hasError, 16, 0x1,
+            record[4], record[3], 0x0002
+        )
+
+        val temperatureString = TestUtils.binary2bPrettyPrint(
+            "temp", temp, 16, 0x0FFF,
+            record[4], record[3], 0x3FFC, temp shr 2
+        )
+
+        val rawTempAdj = if (tempAdj < 0) -tempAdj else tempAdj
+        val tempAdjSign = if (tempAdj < 0) 1 else 0
+        val tempAdjString = TestUtils.binary2bPrettyPrint(
+            "tadj", tempAdj, 16, 0x01FF,
+            record[5], record[4], 0x7FC0, rawTempAdj shr 2
+        )
+
+        val readingPointBin = TestUtils.toBinString(
+            TestUtils.bytesToLong(0, 0,
+                record[5],
+                record[4],
+                record[3],
+                record[2],
+                record[1],
+                record[0],
+            ),
+            48,
+            arrayOf(0x3FFF, 0x3FFC000000, 0x7FC000000000, 0x03800000, 0x800000000000 , 0x7FC000)
+        )
+
+        println("${if (tag.indexTrend == index) "ACTUAL " else ""}offset: $offset")
+        println("raw: $readingPointBin")
+        println(trendString)
+        println(qualityString)
+        println(qualityFlagsString)
+        println(hasErrorString)
+        println(temperatureString)
+        println(tempAdjString)
+        println()
+    }
 //    @Test
 //    fun calibrationInfo() {
 //        val calibrationInfo = tag.calibrationInfo
