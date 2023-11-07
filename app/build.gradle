@@ -7,11 +7,11 @@ plugins {
 
 android {
     namespace 'global.camomile.libresensor'
-    compileSdk 34
+    compileSdk 33
 
     defaultConfig {
         minSdk 23
-        targetSdk 34
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
