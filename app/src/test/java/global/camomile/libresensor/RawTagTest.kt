@@ -30,7 +30,7 @@ class RawTagTest() {
             val trend = tag.trendValue(index)
             val calTrend = tag.calibratedTrendValue(index)
             val mmolTrend = Glucose.convertMGDLToMMOL(calTrend.toFloat())
-            val glucose = Glucose(trend, 120, false)
+            val glucose = Glucose(trend, 120, false, 0, 0, 0,0, false)
             if (index == tag.indexTrend) print("LAST ")
             println("trend:$trend glucose:${glucose.glucose(true)} cal trend:$calTrend mmol:$mmolTrend")
         }
@@ -152,7 +152,7 @@ class RawTagTest() {
 
     private fun printRecord(
         record: ByteArray, index: Int, offset: Int,
-        trend: Int, quality: Int, qualityFlags: Int, hasError: Int, temp: Int, tempAdj: Int
+        trend: Int, quality: Int, qualityFlags: Int, hasError: Boolean, temp: Int, tempAdj: Int
     ){
         val trendString = TestUtils.binary2bPrettyPrint(
             "trend", trend, 16, 0x3FFF,
@@ -170,7 +170,7 @@ class RawTagTest() {
         )
 
         val hasErrorString = TestUtils.binary2bPrettyPrint(
-            "error", hasError, 16, 0x1,
+            "error", (if (hasError) 1 else 0), 16, 0x1,
             record[4], record[3], 0x0002
         )
 

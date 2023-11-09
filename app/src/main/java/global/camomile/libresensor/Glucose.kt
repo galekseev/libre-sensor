@@ -1,11 +1,17 @@
 package global.camomile.libresensor
 
+import androidx.core.location.LocationRequestCompat.Quality
 import java.text.DecimalFormat
 
 data class Glucose(
     val glucoseLevelRaw: Int,
     val ageInSensorMinutes: Int,
-    val isTrendReading: Boolean = false
+    val isTrendReading: Boolean,
+    val temperature: Int = 0,
+    val tempAdjustment: Int = 0,
+    val quality: Int = 0,
+    val qualityFlags: Int = 0,
+    val hasError: Boolean = false,
 ) : Comparable<Glucose?> {
     fun glucose(unitAsMmol: Boolean): Float {
         return if (unitAsMmol) {
@@ -14,6 +20,10 @@ data class Glucose(
             convertRawToMGDL(glucoseLevelRaw.toFloat())
         }
     }
+
+    fun glucoseMMOL(): Float { return glucose(true) }
+
+    fun glucoseMGDL(): Float { return glucose(false) }
 
     fun toString(unitAsMmol: Boolean): String {
         return toString(glucose(unitAsMmol), unitAsMmol)

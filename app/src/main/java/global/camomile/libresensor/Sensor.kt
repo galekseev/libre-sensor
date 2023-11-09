@@ -2,23 +2,25 @@ package global.camomile.libresensor
 
 import java.util.concurrent.TimeUnit
 
-data class Sensor (val serialNumber: String, val startDate: Long, val ageInMinutes: Int) {
-    val timeLeft: Long =
-        (startDate + TimeUnit.MINUTES.toMillis(maxSensorAgeInMinutes - ageInMinutes))
-            .coerceAtLeast(0)
-    val readyInMinutes : Int = (sensorInitializationInMinutes - ageInMinutes)
-            .coerceAtLeast(0)
-
+data class Sensor (val serialNumber: String, val startDate: Long) {
     constructor(rawTagData: RawTag) : this(
         rawTagData.tagId,
         rawTagData.tagDate - rawTagData.tagDate % TimeUnit.MINUTES.toMillis(1)
-                - TimeUnit.MINUTES.toMillis(rawTagData.sensorAgeInMinutes.toLong()),
-        rawTagData.sensorAgeInMinutes
+                - TimeUnit.MINUTES.toMillis(rawTagData.sensorAgeInMinutes.toLong())
     )
 
-    fun timeLeft(atTime: Long): Long {
+    fun timeLeftAt(atTime: Long): Long {
         return (startDate + TimeUnit.MINUTES.toMillis(maxSensorAgeInMinutes) - atTime)
             .coerceAtLeast(0)
+    }
+
+    fun timeLeft(ageInMinutes: Int): Long {
+        return (startDate + TimeUnit.MINUTES.toMillis(maxSensorAgeInMinutes - ageInMinutes))
+            .coerceAtLeast(0)
+    }
+
+    fun readyInMinutes(ageInMinutes: Int): Int {
+        return (sensorInitializationInMinutes - ageInMinutes).coerceAtLeast(0)
     }
 
     companion object {

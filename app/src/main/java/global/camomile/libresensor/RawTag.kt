@@ -55,7 +55,7 @@ data class RawTag (val data: ByteArray, val tagId: String = "", val tagDate: Lon
         return getQualityFlags(index, offsetTrendTable)
     }
 
-    fun historyQualityFags(index: Int): Int {
+    fun historyQualityFlags(index: Int): Int {
         return getQualityFlags(index, offsetHistoryTable)
     }
 
@@ -63,15 +63,15 @@ data class RawTag (val data: ByteArray, val tagId: String = "", val tagDate: Lon
         return (readBits(data, offset + index * tableEntrySize, 0xe, 0xc) and 0x600) shr 9
     }
 
-    fun trendHasError(index: Int): Int {
+    fun trendHasError(index: Int): Boolean {
         return hasError(index, offsetTrendTable)
     }
 
-    fun historyHasError(index: Int): Int {
+    fun historyHasError(index: Int): Boolean {
         return hasError(index, offsetHistoryTable)
     }
-    private fun hasError(index: Int, offset: Int): Int {
-        return readBits(data, offset + index * tableEntrySize, 0x19, 0x1)
+    private fun hasError(index: Int, offset: Int): Boolean {
+        return readBits(data, offset + index * tableEntrySize, 0x19, 0x1) == 1
     }
 
     fun trendQuality(index: Int): Int {
