@@ -2,6 +2,7 @@ package global.camomile.libresensor
 
 import androidx.core.location.LocationRequestCompat.Quality
 import java.text.DecimalFormat
+import kotlin.math.roundToInt
 
 data class Glucose(
     val glucoseLevelRaw: Int,
@@ -13,6 +14,8 @@ data class Glucose(
     val qualityFlags: Int = 0,
     val hasError: Boolean = false,
 ) : Comparable<Glucose?> {
+    //https://github.com/cominixo/OpenLibreNFC/blob/1d097107207edcb2330f4a1ef3e56c36879df42a/app/src/main/java/me/cominixo/openlibrenfc/MainActivity.java#L372
+    val tempCelcius: Double = ((temperature * 0.0027689 + 9.53) * 100.0).roundToInt() / 100.0
     fun glucose(unitAsMmol: Boolean): Float {
         return if (unitAsMmol) {
             convertRawToMMOL(glucoseLevelRaw.toFloat())

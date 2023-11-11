@@ -17,7 +17,7 @@ class RawTagTest() {
     @Test
     fun trend(){
         val index = tag.indexTrend
-        val trend = tag.trendValue(index);
+        val trend = tag.tableValue(index, RawTag.offsetTrendTable);
 
         assertEquals(7, index)
         assertEquals(1805, trend)
@@ -27,12 +27,10 @@ class RawTagTest() {
     fun trendVStrend2(){
         println("trend index ${tag.indexTrend}")
         for (index in 0 until 16) {
-            val trend = tag.trendValue(index)
-            val calTrend = tag.calibratedTrendValue(index)
-            val mmolTrend = Glucose.convertMGDLToMMOL(calTrend.toFloat())
+            val trend = tag.tableValue(index, RawTag.offsetTrendTable)
             val glucose = Glucose(trend, 120, false, 0, 0, 0,0, false)
             if (index == tag.indexTrend) print("LAST ")
-            println("trend:$trend glucose:${glucose.glucose(true)} cal trend:$calTrend mmol:$mmolTrend")
+            println("trend:$trend glucose:${glucose.glucose(true)}")
         }
     }
 
@@ -42,12 +40,12 @@ class RawTagTest() {
             val byteIndex = 28 + index * 6
             val record = tag.data.sliceArray(byteIndex until byteIndex + 7)
             printRecord( record, index, byteIndex,
-                tag.trendValue(index),
-                tag.trendQuality(index),
-                tag.trendQualityFlags(index),
-                tag.trendHasError(index),
-                tag.trendTemperature(index),
-                tag.trendTempAdjustment(index)
+                tag.tableValue(index, RawTag.offsetTrendTable),
+                tag.quality(index, RawTag.offsetTrendTable),
+                tag.qualityFlags(index, RawTag.offsetTrendTable),
+                tag.hasError(index, RawTag.offsetTrendTable),
+                tag.temperature(index, RawTag.offsetTrendTable),
+                tag.tempAdjustment(index, RawTag.offsetTrendTable)
             )
         }
     }
@@ -58,12 +56,12 @@ class RawTagTest() {
             val byteIndex = 124 + index * 6
             val record = tag.data.sliceArray(byteIndex until byteIndex + 7)
             printRecord( record, index, byteIndex,
-                tag.trendValue(index),
-                tag.trendQuality(index),
-                tag.trendQualityFlags(index),
-                tag.trendHasError(index),
-                tag.trendTemperature(index),
-                tag.trendTempAdjustment(index)
+                tag.tableValue(index, RawTag.offsetHistoryTable),
+                tag.quality(index, RawTag.offsetHistoryTable),
+                tag.qualityFlags(index, RawTag.offsetHistoryTable),
+                tag.hasError(index, RawTag.offsetHistoryTable),
+                tag.temperature(index, RawTag.offsetHistoryTable),
+                tag.tempAdjustment(index, RawTag.offsetHistoryTable)
             )
         }
     }
@@ -132,7 +130,7 @@ class RawTagTest() {
     @Test
     fun history() {
         val index = tag.indexHistory
-        val history = tag.historyValue(index)
+        val history = tag.tableValue(index, RawTag.offsetHistoryTable)
 
         assertEquals(6.toByte(), index)
         assertEquals(1576, history)

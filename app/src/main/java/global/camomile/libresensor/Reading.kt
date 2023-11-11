@@ -1,9 +1,5 @@
 package global.camomile.libresensor
 
-import global.camomile.libresensor.interfaces.IPredictionStrategy
-import global.camomile.libresensor.strategies.LastValue
-//import global.camomile.libresensor.strategies.SimpleRegression
-
 data class Reading (
     val tag: RawTag,
     val readingDate: Long = tag.tagDate,
@@ -29,7 +25,7 @@ data class Reading (
 
         for (counter in 0 until NUM_TREND_VALUES) {
             val index = (indexTrend + counter) % NUM_TREND_VALUES
-            val glucoseLevelRaw = tag.trendValue(index)
+            val glucoseLevelRaw = tag.tableValue(index, RawTag.offsetTrendTable)
             // skip zero values if the sensor has not filled the ring buffer yet completely
             if (glucoseLevelRaw > 0) {
                 val ageInSensorMinutes = tag.sensorAgeInMinutes - NUM_TREND_VALUES + counter
@@ -38,21 +34,16 @@ data class Reading (
                         glucoseLevelRaw,
                         ageInSensorMinutes,
                         true,
-                        tag.trendTemperature(index),
-                        tag.trendTempAdjustment(index),
-                        tag.trendQuality(index),
-                        tag.trendQualityFlags(index),
-                        tag.trendHasError(index)
+                        tag.temperature(index, RawTag.offsetTrendTable),
+                        tag.tempAdjustment(index, RawTag.offsetTrendTable),
+                        tag.quality(index, RawTag.offsetTrendTable),
+                        tag.qualityFlags(index, RawTag.offsetTrendTable),
+                        tag.hasError(index, RawTag.offsetTrendTable)
                     )
             }
         }
 
-        if(trend.isNotEmpty()) {
-            glucose = trend.last()
-        }
-        else {
-            glucose = null
-        }
+        glucose = if(trend.isNotEmpty()) trend.last() else null
 
         val mostRecentHistoryAgeInMinutes = 3 + (tag.sensorAgeInMinutes - 3) % HISTORY_INTERVAL_IN_MINUTES
         val indexHistory: Int = tag.indexHistory
@@ -60,7 +51,7 @@ data class Reading (
         // read history values from ring buffer, starting at indexHistory (bytes 124-315)
         for (counter in 0 until NUM_HISTORY_VALUES) {
             val index = (indexHistory + counter) % NUM_HISTORY_VALUES
-            val glucoseLevelRaw: Int = tag.historyValue(index)
+            val glucoseLevelRaw: Int = tag.tableValue(index, RawTag.offsetHistoryTable)
             // skip zero values if the sensor has not filled the ring buffer yet completely
             if (glucoseLevelRaw > 0) {
                 val dataAgeInMinutes =
@@ -69,17 +60,16 @@ data class Reading (
 
                 // skip the first hour of sensor data as it is faulty
                 if (ageInSensorMinutes > Sensor.sensorInitializationInMinutes) {
-                    val glucoseReading = Glucose(
+                    history += Glucose(
                         glucoseLevelRaw,
                         ageInSensorMinutes,
                         false,
-                        tag.historyTemperature(index),
-                        tag.historyTempAdjustment(index),
-                        tag.historyQuality(index),
-                        tag.historyQualityFlags(index),
-                        tag.historyHasError(index)
+                        tag.temperature(index, RawTag.offsetHistoryTable),
+                        tag.tempAdjustment(index, RawTag.offsetHistoryTable),
+                        tag.quality(index, RawTag.offsetHistoryTable),
+                        tag.qualityFlags(index, RawTag.offsetHistoryTable),
+                        tag.hasError(index, RawTag.offsetHistoryTable)
                     )
-                    history.add(glucoseReading)
                 }
             }
         }

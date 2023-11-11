@@ -17,13 +17,6 @@ class ReadingTest() {
         rd.trend.forEach{ println("%.1f %s".format(it.glucose(true), it.ageInSensorMinutes)) }
         println()
 
-        println("Prediction %s, slope %s, age %s".format(
-            rd.prediction?.glucose?.glucose(true),
-            rd.prediction?.slope,
-            rd.prediction?.glucose?.ageInSensorMinutes
-        ))
-        println()
-
         println("Glucose %s, age %s".format(
             rd.glucose?.toString(true),
             rd.glucose?.ageInSensorMinutes

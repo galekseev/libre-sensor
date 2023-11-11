@@ -5,94 +5,48 @@ import kotlin.experimental.and
 
 @Suppress("ArrayInDataClass")
 data class RawTag (val data: ByteArray, val tagId: String = "", val tagDate: Long = System.currentTimeMillis()){
-
     val indexTrend: Int = getByte(offsetTrendIndex).toInt()
     val indexHistory: Int = getByte(offsetHistoryIndex).toInt()
     val sensorAgeInMinutes: Int = getWord(offsetSensorAge)
     val sensorLifetime: Int = getWord(offsetSensorLifetime)
     val calibrationInfo: CalibrationInfo = readCalibrationInfo(data)
+    val sensorState: Byte = getByte(0x4)
+    val sensorRegion: Int = getByte(0x143).toInt()
 
-    fun trendValue(index: Int): Int {
-        return getTableValue(index, offsetTrendTable)
-    }
-
-    fun historyValue(index: Int): Int {
-        return getTableValue(index, offsetHistoryTable)
-    }
-
-    private fun getTableValue(index: Int, offset: Int): Int{
+    fun tableValue(index: Int, offset: Int): Int{
         //return readBits(data, offset + index * tableEntrySize, 0, 0x0E)
         return getWord(offset + index * tableEntrySize) and tableEntryMask
     }
 
-    fun trendTemperature(index: Int): Int {
-        return getTemperature(index, offsetTrendTable)
+    fun temperature(index: Int, offset: Int): Int {
+        return readBits(offset + index * tableEntrySize, 0x1a, 0xc) shl 2
     }
 
-    fun historyTemperature(index: Int): Int {
-        return getTemperature(index, offsetHistoryTable)
+    fun tempAdjustment(index: Int, offset: Int): Int {
+        val tempAdjustment = readBits( offset + index * tableEntrySize, 0x26, 0x9) shl 2
+        val negAdj = readBits(offset + index * tableEntrySize, 0x2f, 0x1) != 0
+        return if (negAdj) -tempAdjustment else tempAdjustment
     }
 
-    private fun getTemperature(index: Int, offset: Int): Int {
-        return readBits(data, offset + index * tableEntrySize, 0x1a, 0xc) shl 2
+    fun quality(index: Int, offset: Int): Int {
+        return readBits(offset + index * tableEntrySize, 0xe, 0xb) and 0x1ff
     }
 
-    fun trendTempAdjustment(index: Int): Int {
-        return  getTempAdjustment(index, offsetTrendTable)
+    fun qualityFlags(index: Int, offset: Int): Int {
+        return (readBits(offset + index * tableEntrySize, 0xe, 0xc) and 0x600) shr 9
     }
 
-    fun historyTempAdjustment(index: Int): Int {
-        return getTempAdjustment(index, offsetHistoryTable)
-    }
-
-    private fun getTempAdjustment(index: Int, offset: Int): Int {
-        val temperatureAdjustment = readBits(data,  offset + index * tableEntrySize, 0x26, 0x9) shl 2
-        val negAdj = readBits(data, offset + index * tableEntrySize, 0x2f, 0x1) != 0
-        return if (negAdj) -temperatureAdjustment else temperatureAdjustment
-    }
-
-    fun trendQualityFlags(index: Int): Int {
-        return getQualityFlags(index, offsetTrendTable)
-    }
-
-    fun historyQualityFlags(index: Int): Int {
-        return getQualityFlags(index, offsetHistoryTable)
-    }
-
-    private fun getQualityFlags(index: Int, offset: Int): Int {
-        return (readBits(data, offset + index * tableEntrySize, 0xe, 0xc) and 0x600) shr 9
-    }
-
-    fun trendHasError(index: Int): Boolean {
-        return hasError(index, offsetTrendTable)
-    }
-
-    fun historyHasError(index: Int): Boolean {
-        return hasError(index, offsetHistoryTable)
-    }
-    private fun hasError(index: Int, offset: Int): Boolean {
-        return readBits(data, offset + index * tableEntrySize, 0x19, 0x1) == 1
-    }
-
-    fun trendQuality(index: Int): Int {
-        return getQuality(index, offsetTrendTable)
-    }
-
-    fun historyQuality(index: Int): Int {
-        return getQuality(index, offsetHistoryTable)
-    }
-
-    private fun getQuality(index: Int, offset: Int): Int {
-        return readBits(data, offset + index * tableEntrySize, 0xe, 0xb) and 0x1ff
+    fun hasError(index: Int, offset: Int): Boolean {
+        return readBits(offset + index * tableEntrySize, 0x19, 0x1) == 1
     }
 
     // TODO: Research how calibration works
-    fun calibratedTrendValue(index: Int): Double {
-        val raw = trendValue(index).toDouble()
-        val temp = trendTemperature(index).toDouble()
-        val tempAdj = trendTempAdjustment(index).toDouble();
-        return calibrationInfo.calibrate(raw, temp, tempAdj)
-    }
+//    fun calibratedTrendValue(index: Int): Double {
+//        val raw = tableValue(index, offsetTrendTable).toDouble()
+//        val temp = temperature(index, offsetTrendTable).toDouble()
+//        val tempAdj = tempAdjustment(index, offsetTrendTable).toDouble();
+//        return calibrationInfo.calibrate(raw, temp, tempAdj)
+//    }
 
     private fun getWord(offset: Int): Int {
         return getWord(data, offset)
@@ -102,25 +56,34 @@ data class RawTag (val data: ByteArray, val tagId: String = "", val tagDate: Lon
         return data[offset] and 0xFF.toByte()
     }
 
+    private fun readBits(
+        byteOffset: Int,
+        bitOffset: Int,
+        bitCount: Int
+    ): Int {
+        return readBits(data, byteOffset, bitOffset, bitCount)
+    }
+
     companion object {
         /*
+            https://github.com/UPetersen/LibreMonitor/wiki
+            https://github.com/captainbeeheart/openfreestyle/blob/master/docs/reverse.md
+            https://passthesalt.ubicast.tv/protected/videos/v125f57aae7bfmvm2r6cajw3qr9nws/attachments/pts2020_talk_15_pique_curiosity_not_diabetic_fingers_technical_report.pdf
             Libre v1 data layout
-            0-15 - unknown (???)
-            16 - calibration info i1, i2 (i1 bits [0..2] i2 bits [4..13])
-            17-26 - unknown (???)
+            0-25 header section
+            26 - trend index
             27 - history index
             28-123 - trend table (16 values * 6 bytes)
             124-315 - history table (32 values * 6 bytes)
             316-317 - sensor age in minutes
-            318-325 - unknown (???)
             326-327 - sensor lifetime
             328-335 - unknown (???)
             336 - calibration info i3
             337-338 - calibration info i4
             360 - max
          */
-        private const val offsetTrendTable = 28
-        private const val offsetHistoryTable = 124
+        const val offsetTrendTable = 28
+        const val offsetHistoryTable = 124
         private const val offsetTrendIndex = 26
         private const val offsetHistoryIndex = 27
         private const val offsetSensorAge = 316
