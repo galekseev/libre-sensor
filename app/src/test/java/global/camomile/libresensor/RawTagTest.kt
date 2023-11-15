@@ -11,7 +11,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
 @ExtendWith(SnapshotExtension::class)
-internal class RawTagTest() {
+internal class RawTagTest {
 
     private lateinit var expect: Expect
 

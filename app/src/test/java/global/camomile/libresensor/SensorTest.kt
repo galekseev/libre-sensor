@@ -10,7 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
 @ExtendWith(SnapshotExtension::class)
-class SensorTest() {
+class SensorTest {
 
     private lateinit var expect: Expect
 
