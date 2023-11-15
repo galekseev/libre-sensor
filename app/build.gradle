@@ -35,8 +35,6 @@ android {
 
 dependencies {
     implementation 'androidx.core:core-ktx:1.12.0'
-    implementation 'com.google.code.gson:gson:2.9.0'
-    //testImplementation 'junit:junit:4.13.2'
 
     // *** Snapshot testing ***
     // In this case we are using the JUnit5 testing framework
