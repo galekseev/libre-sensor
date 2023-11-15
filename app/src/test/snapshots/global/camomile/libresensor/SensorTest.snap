@@ -1,0 +1,96 @@
+global.camomile.libresensor.SensorTest.sensor should match snapshot[0]=[
+  {
+    "serialNumber": "",
+    "startDate": 1699030080000,
+    "ageInMinutes": 16424,
+    "state": "Active",
+    "region": "European",
+    "timeLeft": 224160000,
+    "readyInMinutes": 0
+  }
+]
+
+
+global.camomile.libresensor.SensorTest.sensor should match snapshot[1]=[
+  {
+    "serialNumber": "",
+    "startDate": 1699030080000,
+    "ageInMinutes": 16424,
+    "state": "Active",
+    "region": "European",
+    "timeLeft": 224160000,
+    "readyInMinutes": 0
+  }
+]
+
+
+global.camomile.libresensor.SensorTest.sensor should match snapshot[2]=[
+  {
+    "serialNumber": "",
+    "startDate": 1699030080000,
+    "ageInMinutes": 16424,
+    "state": "Active",
+    "region": "European",
+    "timeLeft": 224160000,
+    "readyInMinutes": 0
+  }
+]
+
+
+global.camomile.libresensor.SensorTest.sensor should match snapshot[3]=[
+  {
+    "serialNumber": "",
+    "startDate": 1699030080000,
+    "ageInMinutes": 16424,
+    "state": "Active",
+    "region": "European",
+    "timeLeft": 224160000,
+    "readyInMinutes": 0
+  }
+]
+
+
+global.camomile.libresensor.SensorTest.sensor should match snapshot[4]=[
+  {
+    "serialNumber": "",
+    "startDate": 1699030080000,
+    "ageInMinutes": 16424,
+    "state": "Active",
+    "region": "European",
+    "timeLeft": 224160000,
+    "readyInMinutes": 0
+  }
+]
+
+
+global.camomile.libresensor.SensorTest.sensor should match snapshot[5]=[
+  {
+    "serialNumber": "",
+    "startDate": 1699030080000,
+    "ageInMinutes": 16424,
+    "state": "Active",
+    "region": "European",
+    "timeLeft": 224160000,
+    "readyInMinutes": 0
+  }
+]
+
+
+global.camomile.libresensor.SensorTest.sensorSerialNumber should match snapshot[0]=[
+  "M000048J24"
+]
+
+
+global.camomile.libresensor.SensorTest.sensorSerialNumber should match snapshot[1]=[
+  "M0060134MR"
+]
+
+
+global.camomile.libresensor.SensorTest.sensorSerialNumber should match snapshot[2]=[
+  "M00601ZJZD"
+]
+
+
+global.camomile.libresensor.SensorTest.sensorSerialNumber should match snapshot[3]=[
+  "M0008D9D4W"
+]

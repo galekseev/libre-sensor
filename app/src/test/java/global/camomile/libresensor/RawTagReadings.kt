@@ -102,6 +102,22 @@ class RawTagReadings {
         val CloudReading4 = decode64("oHoQGwMAAAAAAAAAAAAAAAAAAAAAAAAAKgYAC64CyCQbAaUCyCQbAZoCyDwbAZUCyEzbAI0CyAwbAYoCyDAbAX8CyEgbAWkCyOgaAWwCyNwaAWsCyOwaAW4CyOAaAXYCyBQbAXwCyPAaAZQCyMwaAasCyJhaAcwCyFhaAU0GyPAbATYGyEgcAXkGyJwcAdUGyOTcAKkGyEjdAF4GyNSdAGQFyBzdANEEyFQcAdYDyOwaARsDyKgaAY0CyAwbAa8EyGDeAHMEyBTdAAIEyBDdAMYDyBjdAJUDyMTcAD4DyNQbAd4DyDTcAGkFyBQcATkFyIyZAbUEyNSZASYFyMyZAcQGyKyZAckHyAiaATwHyHSZAUsGyMyZAToGyEhaATgGyAQbAVwGyKAbAWQGyAAcAUoGyOAbATAGyEgcAVEGAABhiwAIkg0sURQHloBaAO2mAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
         val CloudReading5 = decode64("oHoQGwMAAAAAAAAAAAAAAAAAAAAAAAAAbwAADAcGyAQaAfYFyEwaAe4FyCwaAd8FyGgaAdYFyBQbAcIFyEwbAbkFyBQbAbIFyBQbAawFyMAaAbAFyKwaAbUFyHwaAbkFyIAaAb4FyIwaAbwFyFAaAcAFyBxaAb4FyChaAVcEyDQgASQDyKjfANkDyNwcAXMEyGzfAAcEyLihADsDyCSjAAkDyDgfAQIFyFAbAd8GyHxaAawGyMRZAVgGyJRXAd8FyGgaAZcKyAxaAUUMyAhbAbwMyCgbAZwMyOBZAYQLyGhaAZMKyJRaAdgJyGhaATMJyGBaAX0IyLQaAQMIyEQaAVAHyJgbAWgGyBTcANAFyGwcAf0FyAjgAJ8DyNTgAGsCyOzeAL4CyCAgAccEyJgdAWEGyJwdAVIFyJwdAQEMAADGmQAIkg2OURQHloBaAO2mAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
+        val RawTagsArray : Array<ByteArray> = arrayOf(
+            RawTagReadings.DorianScholz,
+            RawTagReadings.CloudReading1,
+            RawTagReadings.CloudReading2,
+            RawTagReadings.CloudReading3,
+            RawTagReadings.CloudReading4,
+            RawTagReadings.CloudReading5
+        );
+
+        val RawTagsIds = arrayOf(
+            "1111110000a007e0",
+            "a664046000a007e0",
+            "fbf1056000a007e0",
+            "272c310400a007e0"
+        );
+
         private fun decode64(base64String: String) : ByteArray {
             val decoder = Base64.getDecoder()
             return decoder.decode(base64String)//.toUByteArray()
