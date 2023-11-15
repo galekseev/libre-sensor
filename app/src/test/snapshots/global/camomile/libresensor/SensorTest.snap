@@ -1,12 +1,10 @@
 global.camomile.libresensor.SensorTest.sensor should match snapshot[0]=[
   {
     "serialNumber": "",
-    "startDate": 1699030080000,
+    "startDate": 1676693760000,
     "ageInMinutes": 16424,
     "state": "Active",
-    "region": "European",
-    "timeLeft": 224160000,
-    "readyInMinutes": 0
+    "region": "European"
   }
 ]
 
@@ -14,12 +12,10 @@ global.camomile.libresensor.SensorTest.sensor should match snapshot[0]=[
 global.camomile.libresensor.SensorTest.sensor should match snapshot[1]=[
   {
     "serialNumber": "",
-    "startDate": 1699030080000,
+    "startDate": 1676693760000,
     "ageInMinutes": 16424,
     "state": "Active",
-    "region": "European",
-    "timeLeft": 224160000,
-    "readyInMinutes": 0
+    "region": "European"
   }
 ]
 
@@ -27,12 +23,10 @@ global.camomile.libresensor.SensorTest.sensor should match snapshot[1]=[
 global.camomile.libresensor.SensorTest.sensor should match snapshot[2]=[
   {
     "serialNumber": "",
-    "startDate": 1699030080000,
+    "startDate": 1676693760000,
     "ageInMinutes": 16424,
     "state": "Active",
-    "region": "European",
-    "timeLeft": 224160000,
-    "readyInMinutes": 0
+    "region": "European"
   }
 ]
 
@@ -40,12 +34,10 @@ global.camomile.libresensor.SensorTest.sensor should match snapshot[2]=[
 global.camomile.libresensor.SensorTest.sensor should match snapshot[3]=[
   {
     "serialNumber": "",
-    "startDate": 1699030080000,
+    "startDate": 1676693760000,
     "ageInMinutes": 16424,
     "state": "Active",
-    "region": "European",
-    "timeLeft": 224160000,
-    "readyInMinutes": 0
+    "region": "European"
   }
 ]
 
@@ -53,12 +45,10 @@ global.camomile.libresensor.SensorTest.sensor should match snapshot[3]=[
 global.camomile.libresensor.SensorTest.sensor should match snapshot[4]=[
   {
     "serialNumber": "",
-    "startDate": 1699030080000,
+    "startDate": 1676693760000,
     "ageInMinutes": 16424,
     "state": "Active",
-    "region": "European",
-    "timeLeft": 224160000,
-    "readyInMinutes": 0
+    "region": "European"
   }
 ]
 
@@ -66,12 +56,10 @@ global.camomile.libresensor.SensorTest.sensor should match snapshot[4]=[
 global.camomile.libresensor.SensorTest.sensor should match snapshot[5]=[
   {
     "serialNumber": "",
-    "startDate": 1699030080000,
+    "startDate": 1676693760000,
     "ageInMinutes": 16424,
     "state": "Active",
-    "region": "European",
-    "timeLeft": 224160000,
-    "readyInMinutes": 0
+    "region": "European"
   }
 ]
 
