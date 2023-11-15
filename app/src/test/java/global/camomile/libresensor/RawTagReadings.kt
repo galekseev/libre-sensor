@@ -103,12 +103,12 @@ class RawTagReadings {
         val CloudReading5 = decode64("oHoQGwMAAAAAAAAAAAAAAAAAAAAAAAAAbwAADAcGyAQaAfYFyEwaAe4FyCwaAd8FyGgaAdYFyBQbAcIFyEwbAbkFyBQbAbIFyBQbAawFyMAaAbAFyKwaAbUFyHwaAbkFyIAaAb4FyIwaAbwFyFAaAcAFyBxaAb4FyChaAVcEyDQgASQDyKjfANkDyNwcAXMEyGzfAAcEyLihADsDyCSjAAkDyDgfAQIFyFAbAd8GyHxaAawGyMRZAVgGyJRXAd8FyGgaAZcKyAxaAUUMyAhbAbwMyCgbAZwMyOBZAYQLyGhaAZMKyJRaAdgJyGhaATMJyGBaAX0IyLQaAQMIyEQaAVAHyJgbAWgGyBTcANAFyGwcAf0FyAjgAJ8DyNTgAGsCyOzeAL4CyCAgAccEyJgdAWEGyJwdAVIFyJwdAQEMAADGmQAIkg2OURQHloBaAO2mAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
         val RawTagsArray : Array<ByteArray> = arrayOf(
-            RawTagReadings.DorianScholz,
-            RawTagReadings.CloudReading1,
-            RawTagReadings.CloudReading2,
-            RawTagReadings.CloudReading3,
-            RawTagReadings.CloudReading4,
-            RawTagReadings.CloudReading5
+            DorianScholz,
+            CloudReading1,
+            CloudReading2,
+            CloudReading3,
+            CloudReading4,
+            CloudReading5
         );
 
         val RawTagsIds = arrayOf(
