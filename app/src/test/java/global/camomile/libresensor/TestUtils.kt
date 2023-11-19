@@ -154,6 +154,5 @@ class TestUtils {
             else
                 "bytes: $numberBin int: $numberInt raw: $rawNumber $argName: $number"
         }
-
     }
 }

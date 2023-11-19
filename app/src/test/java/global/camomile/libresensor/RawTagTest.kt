@@ -1,83 +1,148 @@
 package global.camomile.libresensor
 
-import androidx.core.location.LocationRequestCompat.Quality
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import global.camomile.libresensor.RawTagReadings.Companion.RawTagsArray
 
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- */
-class RawTagTest() {
+import au.com.origin.snapshots.Expect
+import au.com.origin.snapshots.junit5.SnapshotExtension
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
+
+@ExtendWith(SnapshotExtension::class)
+internal class RawTagTest {
+
+    private lateinit var expect: Expect
 
     private val rawTag : ByteArray = RawTagReadings.DorianScholz
     private val tag : RawTag = RawTag(rawTag, "id")
 
-    @Test
-    fun trend(){
-        val index = tag.indexTrend
-        val trend = tag.trendValue(index);
-
-        assertEquals(7, index)
-        assertEquals(1805, trend)
-    }
-
-    @Test
-    fun trendVStrend2(){
-        println("trend index ${tag.indexTrend}")
-        for (index in 0 until 16) {
-            val trend = tag.trendValue(index)
-            val calTrend = tag.calibratedTrendValue(index)
-            val mmolTrend = Glucose.convertMGDLToMMOL(calTrend.toFloat())
-            val glucose = Glucose(trend, 120, false)
-            if (index == tag.indexTrend) print("LAST ")
-            println("trend:$trend glucose:${glucose.glucose(true)} cal trend:$calTrend mmol:$mmolTrend")
+    @ParameterizedTest
+    @ValueSource(ints = [0, 1, 2, 3, 4, 5])
+    fun `trend should match snapshot`(tag: Int){
+        val tagA = RawTag(RawTagsArray[tag], "51974c0a00a007e0", 1657733813801)
+        val trend = Array(32) { IntArray(6) }
+        for (i in 0 until 16){
+            trend[i][0] = tagA.tableValue(i, RawTag.offsetTrendTable)
+            trend[i][1] = tagA.temperature(i, RawTag.offsetTrendTable)
+            trend[i][2] = tagA.tempAdjustment(i, RawTag.offsetTrendTable)
+            trend[i][3] = tagA.quality(i, RawTag.offsetTrendTable)
+            trend[i][4] = tagA.qualityFlags(i, RawTag.offsetTrendTable)
+            trend[i][5] = if (tagA.hasError(i, RawTag.offsetTrendTable)) 1 else 0
         }
+        expect.serializer("json").scenario("$tag").toMatchSnapshot(trend)
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = [0, 1, 2, 3, 4, 5])
+    fun `history should match snapshot`(tag: Int){
+        val tagA = RawTag(RawTagsArray[tag], "51974c0a00a007e0", 1657733813801)
+        val history = Array(32) { IntArray(6) }
+        for (i in 0 until 32){
+            history[i][0] = tagA.tableValue(i, RawTag.offsetHistoryTable)
+            history[i][1] = tagA.temperature(i, RawTag.offsetHistoryTable)
+            history[i][2] = tagA.tempAdjustment(i, RawTag.offsetHistoryTable)
+            history[i][3] = tagA.quality(i, RawTag.offsetHistoryTable)
+            history[i][4] = tagA.qualityFlags(i, RawTag.offsetHistoryTable)
+            history[i][5] = if (tagA.hasError(i, RawTag.offsetHistoryTable)) 1 else 0
+        }
+        expect.serializer("json").scenario("$tag").toMatchSnapshot(history)
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = [0, 1, 2, 3, 4, 5])
+    fun `indexTrend should match snapshot`(tag: Int){
+        val tagA = RawTag(RawTagsArray[tag], "51974c0a00a007e0", 1657733813801)
+        val indexTrend = tagA.indexTrend
+        expect.scenario("$tag").toMatchSnapshot(indexTrend)
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = [0, 1, 2, 3, 4, 5])
+    fun `indexHistory should match snapshot`(tag: Int){
+        val tagA = RawTag(RawTagsArray[tag], "51974c0a00a007e0", 1657733813801)
+        val indexHistory = tagA.indexHistory
+        expect.scenario("$tag").toMatchSnapshot(indexHistory)
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = [0, 1, 2, 3, 4, 5])
+    fun `sensorAgeInMinutes should match snapshot`(tag: Int){
+        val tagA = RawTag(RawTagsArray[tag], "51974c0a00a007e0", 1657733813801)
+        val sensorAgeInMinutes = tagA.sensorAgeInMinutes
+        expect.scenario("$tag").toMatchSnapshot(sensorAgeInMinutes)
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = [0, 1, 2, 3, 4, 5])
+    fun `sensorLifetime should match snapshot`(tag: Int){
+        val tagA = RawTag(RawTagsArray[tag], "51974c0a00a007e0", 1657733813801)
+        val sensorLifetime = tagA.sensorLifetime
+        expect.scenario("$tag").toMatchSnapshot(sensorLifetime)
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = [0, 1, 2, 3, 4, 5])
+    fun `sensorState should match snapshot`(tag: Int){
+        val tagA = RawTag(RawTagsArray[tag], "51974c0a00a007e0", 1657733813801)
+        val sensorState = tagA.sensorState
+        expect.scenario("$tag").toMatchSnapshot(sensorState)
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = [0, 1, 2, 3, 4, 5])
+    fun `sensorRegion should match snapshot`(tag: Int){
+        val tagA = RawTag(RawTagsArray[tag], "51974c0a00a007e0", 1657733813801)
+        val sensorRegion = tagA.sensorRegion
+        expect.scenario("$tag").toMatchSnapshot(sensorRegion)
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = [0, 1, 2, 3, 4, 5])
+    fun `calibrationInfo should match snapshot`(tag: Int){
+        val tagA = RawTag(RawTagsArray[tag], "51974c0a00a007e0", 1657733813801)
+        val sensorRegion = tagA.calibrationInfo
+        expect.serializer("json").scenario("$tag").toMatchSnapshot(sensorRegion)
     }
 
     @Test
+    @Disabled("For debugging purposes only")
     fun viewTrend(){
         for (index in 0 until 16) {
             val byteIndex = 28 + index * 6
             val record = tag.data.sliceArray(byteIndex until byteIndex + 7)
             printRecord( record, index, byteIndex,
-                tag.trendValue(index),
-                tag.trendQuality(index),
-                tag.trendQualityFlags(index),
-                tag.trendHasError(index),
-                tag.trendTemperature(index),
-                tag.trendTempAdjustment(index)
+                tag.tableValue(index, RawTag.offsetTrendTable),
+                tag.quality(index, RawTag.offsetTrendTable),
+                tag.qualityFlags(index, RawTag.offsetTrendTable),
+                tag.hasError(index, RawTag.offsetTrendTable),
+                tag.temperature(index, RawTag.offsetTrendTable),
+                tag.tempAdjustment(index, RawTag.offsetTrendTable)
             )
         }
     }
 
     @Test
+    @Disabled("For debugging purposes only")
     fun viewHistory(){
         for (index in 0 until 32) {
             val byteIndex = 124 + index * 6
             val record = tag.data.sliceArray(byteIndex until byteIndex + 7)
             printRecord( record, index, byteIndex,
-                tag.trendValue(index),
-                tag.trendQuality(index),
-                tag.trendQualityFlags(index),
-                tag.trendHasError(index),
-                tag.trendTemperature(index),
-                tag.trendTempAdjustment(index)
+                tag.tableValue(index, RawTag.offsetHistoryTable),
+                tag.quality(index, RawTag.offsetHistoryTable),
+                tag.qualityFlags(index, RawTag.offsetHistoryTable),
+                tag.hasError(index, RawTag.offsetHistoryTable),
+                tag.temperature(index, RawTag.offsetHistoryTable),
+                tag.tempAdjustment(index, RawTag.offsetHistoryTable)
             )
         }
     }
 
     @Test
+    @Disabled("For debugging purposes only")
     fun viewCalibration(){
-//        val i1 = RawTag.readBits(data, 2, 0, 3)
-//        val i2 = RawTag.readBits(data, 2, 3, 0x0A)
-//        val i3 = RawTag.readBits(data, 0x150, 0, 8)
-//        val i4 = RawTag.readBits(data, 0x150, 8, 0xe)
-//        val negativei3 = RawTag.readBits(data, 0x150, 0x21, 1) != 0
-//        val i5 = RawTag.readBits(data, 0x150, 0x28, 0xc) shl 2
-//        val i6 = RawTag.readBits(data, 0x150, 0x34, 0xc) shl 2
-
         val i1 = tag.calibrationInfo.i1
         val i1bin = TestUtils.toBinString(tag.data[2], 0x7)
         val i2 = tag.calibrationInfo.i2
@@ -129,30 +194,9 @@ class RawTagTest() {
         println()
     }
 
-    @Test
-    fun history() {
-        val index = tag.indexHistory
-        val history = tag.historyValue(index)
-
-        assertEquals(6.toByte(), index)
-        assertEquals(1576, history)
-    }
-
-    @Test
-    fun sensorAge() {
-        val age = tag.sensorAgeInMinutes
-        assertEquals(16424, age)
-    }
-
-    @Test
-    fun sensorLifetime(){
-        val lifetime = tag.sensorLifetime
-        assertEquals(20757, lifetime)
-    }
-
     private fun printRecord(
         record: ByteArray, index: Int, offset: Int,
-        trend: Int, quality: Int, qualityFlags: Int, hasError: Int, temp: Int, tempAdj: Int
+        trend: Int, quality: Int, qualityFlags: Int, hasError: Boolean, temp: Int, tempAdj: Int
     ){
         val trendString = TestUtils.binary2bPrettyPrint(
             "trend", trend, 16, 0x3FFF,
@@ -170,7 +214,7 @@ class RawTagTest() {
         )
 
         val hasErrorString = TestUtils.binary2bPrettyPrint(
-            "error", hasError, 16, 0x1,
+            "error", (if (hasError) 1 else 0), 16, 0x1,
             record[4], record[3], 0x0002
         )
 
@@ -209,27 +253,4 @@ class RawTagTest() {
         println(tempAdjString)
         println()
     }
-//    @Test
-//    fun calibrationInfo() {
-//        val calibrationInfo = tag.calibrationInfo
-//        assertEquals(0, calibrationInfo.i1)
-//        assertEquals(580, calibrationInfo.i2)
-//        assertEquals(6, calibrationInfo.i3)
-//        assertEquals(6716, calibrationInfo.i4)
-//        assertEquals(10256, calibrationInfo.i5)
-//        assertEquals(7068, calibrationInfo.i6)
-//    }
-
-//    @Test
-//    fun sensorSerial(){
-//        val tagId = "fbf1056000a007e0"
-//        println(RawTag.toHexString(tag.sensorSerial))
-//        println(tagId)
-//    }
-//
-//    @Test
-//    fun tostring(){
-//        println(tag.sensorSerial)
-//    }
-
 }

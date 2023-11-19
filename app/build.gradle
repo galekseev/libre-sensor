@@ -35,11 +35,27 @@ android {
 
 dependencies {
     implementation 'androidx.core:core-ktx:1.12.0'
-    implementation 'org.nield:kotlin-statistics:1.2.1'
-    testImplementation 'junit:junit:4.13.2'
+
+    // *** Snapshot testing ***
+    // In this case we are using the JUnit5 testing framework
+    testImplementation 'io.github.origin-energy:java-snapshot-testing-junit5:4.0.6'
+    // slf4j logging implementation if you don't already have one
+    testImplementation("org.slf4j:slf4j-simple:2.0.9")
+    // Optional: Many will want to serialize into JSON.  In this case you should also add the Jackson plugin
+    testImplementation 'io.github.origin-energy:java-snapshot-testing-plugin-jackson:4.0.6'
+    testImplementation 'com.fasterxml.jackson.core:jackson-core:2.15.3'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.15.3'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
+    // Optional: If you want Jackson to serialize Java 8 date/time types or Optionals you should also add the following dependencies
+    testRuntimeOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.15.3'
+    testRuntimeOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.3'
 }
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
         languageVersion = "1.8"
     }
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
 }
